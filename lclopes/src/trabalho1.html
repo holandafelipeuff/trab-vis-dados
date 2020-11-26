@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trabalho 1 - Visualização de Dados</title>
+    <link rel="stylesheet" href="trabalho1.css">
+
+    <!-- Inclusão da biblioteca d3js -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+
+    <div id="scatterplot"></div>
+    <div style="width: 100%; overflow: hidden;">
+        <div style="width: 600px; float: left;"> <div id="lineplot1"></div></div>
+        <div style="margin-left: 620px;"> <div id="lineplot2"></div></div>
+    </div>
+    <div id="barplot"></div>
+</body>
+
+<script type="module" src="scatterplot.js"></script>
+<script type="module" src="lineplot.js"></script>
+<script type="module" src="barplot.js"></script>
+<script type="module" src="main.js"></script>
+</script>
+
+</html>
