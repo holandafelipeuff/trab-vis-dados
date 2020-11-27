@@ -34,11 +34,14 @@ export class Scatterplot {
   async loadCSV(file) {
 
     this.circles = await d3.csv(file, d => {
+      var datetime = new Date(d.data_inversa + d.horario);
+      
+      var ms = datetime.getTime();
       return {
-        cx: +d.gni_per_capita,
-        cy: +d.hdi,
-        col: +d.life_expect,
-        //cat: d.year,
+        cx: +d.km,
+        cy: +d.pessoas,
+        //col: +d.mortos,
+        cat: d.tipo_acidente,
         r: 5
       }
     
@@ -66,8 +69,8 @@ export class Scatterplot {
     this.xScale = d3.scaleLinear().domain(xExtent).nice().range([0, this.config.width]);
     this.yScale = d3.scaleLinear().domain(yExtent).nice().range([this.config.height, 0]);
 
-    this.colScale = d3.scaleSequential(d3.interpolateRgb("red", "blue")).domain(colExtent);
-    //this.catScale = d3.scaleOrdinal().domain(catExtent).range(d3.schemeTableau10);
+    //this.colScale = d3.scaleSequential(d3.interpolateRgb("red", "blue")).domain(colExtent);
+    this.catScale = d3.scaleOrdinal().domain(catExtent).range(d3.schemeTableau10);
   }
 
   createAxis() {
@@ -92,21 +95,21 @@ export class Scatterplot {
       .attr("x", -150)
       .attr("dy", ".75em")
       .attr("transform", "rotate(-90)")
-      .text("Índice de Desenvolvimento Humano (IDH)");
+      .text("Pessoas envolvidas no acidente");
 
     this.svg.append("text")             
       .attr("transform",
             "translate(" + (this.config.width/2 + 100) + " ," + 
                            (this.config.height + this.config.top + 40)  + ")")
       .style("text-anchor", "middle")
-      .text("Produto Interno Bruto (PIB) per capita");
+      .text("Quilômetro");
 
     this.svg.append("text")             
       .attr("transform",
             "translate(" + (this.config.width/2 + 100) + " ," + 
                            (this.config.height + this.config.top + 60) + ")")
       .style("text-anchor", "middle")
-      .text("Expectativa de vida (vermelho = menor e azul = maior)");
+      .text("Cores = tipo de acidente");
   }
 
   renderCircles() {
@@ -116,7 +119,7 @@ export class Scatterplot {
       .attr('cx', d => this.xScale(d.cx))
       .attr('cy', d => this.yScale(d.cy))
       .attr('r' , d => d.r)
-      .attr('fill', d => this.colScale(d.col));
-      //.attr('fill', d => this.catScale(d.cat));
+      //.attr('fill', d => this.colScale(d.col));
+      .attr('fill', d => this.catScale(d.cat));
   }
 }

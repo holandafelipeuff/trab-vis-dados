@@ -1,4 +1,4 @@
-export class Lineplot {
+export class Lineplot2 {
   constructor(config) {
     this.config = config;
 
@@ -35,10 +35,10 @@ export class Lineplot {
 
     data.reduce(function(res, value) {
       if (!res[value.ano]) {
-        res[value.ano] = { ano: value.ano, pessoas: 0 };
+        res[value.ano] = { ano: value.ano, mortos: 0 };
         set.push(res[value.ano])
       }
-      res[value.ano].pessoas += value.pessoas;
+      res[value.ano].mortos += value.mortos;
       return res;
     }, {});
 
@@ -49,7 +49,7 @@ export class Lineplot {
     let preData = await d3.csv(file, d => {
       return {
         ano: +d.ano,
-        pessoas: +d.pessoas,
+        mortos: +d.mortos,
       }
     });
     this.set = this.groupByYear(preData);
@@ -74,7 +74,7 @@ export class Lineplot {
     });
 
     let yExtent = d3.extent(this.set, d => {
-      return d.pessoas;
+      return d.mortos;
     });
 
     console.log(yExtent)
@@ -106,7 +106,7 @@ export class Lineplot {
       .attr("x", -200)
       .attr("dy", ".75em")
       .attr("transform", "rotate(-90)")
-      .text("Pessoas envolvidas no acidente");
+      .text("Número de mortos em acidentes");
 
     this.svg.append("text")             
       .attr("transform",
@@ -125,7 +125,7 @@ export class Lineplot {
         .attr("stroke-width", 1.5)
         .attr("d", d3.line()
           .x(d => this.xScale(d.ano))
-          .y(d => this.yScale(d.pessoas))
+          .y(d => this.yScale(d.mortos))
         )
   }
 
