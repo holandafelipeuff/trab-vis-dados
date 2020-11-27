@@ -1,4 +1,4 @@
-class BarplotsAccidentsByPeriodClass {
+class BarplotsAccidentsByPeriod {
   constructor(config) {
     this.config = config;
 
@@ -7,6 +7,9 @@ class BarplotsAccidentsByPeriodClass {
 
     this.xScale = null;
     this.yScale = null;
+
+    this.xExtent = null;
+    this.yExtent = null;
 
     this.bars = []
 
@@ -28,16 +31,16 @@ class BarplotsAccidentsByPeriodClass {
       .append('g')
       .attr("transform", `translate(${this.config.left},${this.config.top})`)
   }
-  
+
   groupByDiaSemana(data) {
     let bars = [];
 
     data.reduce(function(res, value) {
       if (!res[value.dia_semana]) {
-        res[value.dia_semana] = { dia_semana: value.dia_semana, qtd_mortes: 0 };
+        res[value.dia_semana] = { dia_semana: value.dia_semana, qtd_acidentes: 0 };
         bars.push(res[value.dia_semana])
       }
-      res[value.dia_semana].qtd_mortes += 1;
+      res[value.dia_semana].qtd_acidentes = res[value.dia_semana].qtd_acidentes + 1;
       return res;
     }, {});
 
@@ -48,7 +51,7 @@ class BarplotsAccidentsByPeriodClass {
     let data = await d3.csv(file, d => {
       return {
         data_inversa: d.data_inversa,
-        dia_semana: d.dia_semana,
+        dia_semana: d.dia_semana
       }
     });
     this.bars = this.groupByDiaSemana(data);
@@ -56,18 +59,16 @@ class BarplotsAccidentsByPeriodClass {
   }
 
   createScales() {
-    const dias_semana = this.bars.map(d => {
+    this.xExtent = this.bars.map(d => {
       return d.dia_semana;
     });
 
-    let yExtent = d3.extent(this.bars, d => {
-      return d.qtd_mortes;
+    this.yExtent = d3.extent(this.bars, d => {
+      return d.qtd_acidentes;
     });
 
-    console.log(yExtent)
-
-    this.xScale = d3.scaleBand().domain(dias_semana).range([0, this.config.width]);
-    this.yScale = d3.scaleLinear().domain(yExtent).nice().range([this.config.height, 0]);
+    this.xScale = d3.scaleBand().domain(this.xExtent).range([0, this.config.width]);
+    this.yScale = d3.scaleLinear().domain(this.yExtent).nice().range([this.config.height, 0]);
   }
 
   createAxis() {
@@ -100,13 +101,10 @@ class BarplotsAccidentsByPeriodClass {
       .attr("x", -200)
       .attr("dy", ".90em")
       .attr("transform", "rotate(-90)")
-      .text("Quantidade de Mortes");
+      .text("Quantidade de acidentes");
   }
 
   renderBars() {
-    console.log(this.config.height)
-    console.log(this.yScale(0))
-    
     this.margins.selectAll('rect')
       .data(this.bars)
       .enter()
@@ -114,30 +112,31 @@ class BarplotsAccidentsByPeriodClass {
         .attr('x', d => this.xScale(d.dia_semana))
         .attr("width", this.xScale.bandwidth())
         .attr('fill', '#69b3a2')
-        .attr("height", d => this.config.height - this.yScale(0))
-        .attr('y', d => this.yScale(0));
+        .attr("height", d => this.config.height - this.yScale(this.yExtent[0]))
+        .attr('y', d => this.yScale(this.yExtent[0]));
   }
 
   renderAnimationOnLoading() {
     this.margins.selectAll('rect')
       .transition()
       .duration(800)
-      .attr("y", d => this.yScale(d.qtd_mortes))
-      .attr("height", d => this.config.height - this.yScale(d.qtd_mortes))
+      .attr("y", d => this.yScale(d.qtd_acidentes))
+      .attr("height", d => this.config.height - this.yScale(d.qtd_acidentes))
       .delay((d,i) => {return(i*100)})
   }
 }
 
+
 async function main() {
   let barplotsConfig = {div: '#main1', width: 500, height: 500, top: 100, left: 120, bottom: 100, right: 120};
   
-  let barplotsClass = new BarplotsAccidentsByPeriodClass(barplotsConfig);
+  let barplotsClass = new BarplotsAccidentsByPeriod(barplotsConfig);
   await barplotsClass.loadCSV('../../data/data.csv');
 
   barplotsClass.createScales();
   barplotsClass.createAxis();
   barplotsClass.renderBars();
-  //barplotsClass.renderAnimationOnLoading()
+  barplotsClass.renderAnimationOnLoading()
 }
 
 main();
