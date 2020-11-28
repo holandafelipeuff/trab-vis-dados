@@ -38,65 +38,104 @@ class BarplotsByPeriod {
     }
   }
 
-  groupByDiaSemana(data) {
+  groupByDiaSemana(ano) {
     let bars = [];
 
-    data.reduce(function(res, value) {
+    this.loadedData.reduce(function(res, value) {
       if (!res[value.dia_semana]) {
         res[value.dia_semana] = { group: value.dia_semana, value: 0 };
         bars.push(res[value.dia_semana])
       }
-      res[value.dia_semana].value = res[value.dia_semana].value + 1;
+      
+      if (value.ano_acidente == ano) {
+        res[value.dia_semana].value = res[value.dia_semana].value + 1;
+      }
       return res;
     }, {});
 
-    return bars;
+    function sortByDiaSemana(bars) {
+      let diasSemana = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"];
+      let newBars = [];
+
+      diasSemana.forEach(diaSemana => {
+        bars.forEach(bar => {
+          if (bar.group == diaSemana) {
+            newBars.push(bar);
+          }
+        });
+      });
+
+      return newBars;
+    }
+
+    return sortByDiaSemana(bars);
   }
 
-  groupByMes(data) {
+  groupByMes(ano) {
     let bars = [];
 
-    data.reduce(function(res, value) {
+    this.loadedData.reduce(function(res, value) {
       if (!res[value.mes_acidente]) {
-        res[value.mes_acidente] = { group: value.mes_acidente, value: 0 };
+        res[value.mes_acidente] = { group: value.mes_acidente + 1, value: 0 };
         bars.push(res[value.mes_acidente])
       }
-      res[value.mes_acidente].value = res[value.mes_acidente].value + 1;
+      
+      if (value.ano_acidente == ano) {
+        res[value.mes_acidente].value = res[value.mes_acidente].value + 1;
+      }
+
       return res;
     }, {});
 
-    return bars;
+    function compareByMes(a, b) {
+      if (a.group > b.group) return 1;
+      if (b.group > a.group) return -1;
+    
+      return 0;
+    }
+
+    return bars.sort(compareByMes);
   }
 
   async loadCSV(file) {
     let data = await d3.csv(file, d => {
       let accidentDate = new Date(d.data_inversa);
-      let accidentMonth = accidentDate.getMonth()
+      let accidentMonth = accidentDate.getMonth();
+      let accidentYear = accidentDate.getFullYear();
       return {
         data_inversa: d.data_inversa,
         dia_semana: d.dia_semana,
-        mes_acidente: accidentMonth
+        mes_acidente: accidentMonth,
+        ano_acidente: accidentYear
       }
     });
 
-    this.data1 = this.groupByDiaSemana(data);
-    this.data2 = this.groupByMes(data);
+    this.loadedData = data;
+  }
+
+  setData1AndData2(){
+    let ano = selecElement.value;
+    
+    this.data1 = this.groupByDiaSemana(ano);
+    this.data2 = this.groupByMes(ano);
   }
 }
 
 async function loadInfo(barplotsByPeriod) {
   await barplotsByPeriod.loadCSV('../../data/data.csv');
-  
+
   // Initialize the plot with the first dataset
   update(1)
 }
+
+let selecElement = document.getElementById("ano");
 
 let barplotsByPeriod = new BarplotsByPeriod();
 loadInfo(barplotsByPeriod);
 
 // Função para criar e dar update no grágico
-async function update(dataSelector) {
-  
+function update(dataSelector) {  
+  barplotsByPeriod.setData1AndData2();
   barplotsByPeriod.setDados(dataSelector);
 
   // Update the X axis
