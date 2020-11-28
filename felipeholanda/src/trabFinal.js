@@ -16,6 +16,23 @@ class BarplotsByPeriod {
       .attr("transform",
             "translate(" + this.margin.left + "," + this.margin.top + ")");
 
+    this.svg.append("text")
+      .attr("text-anchor", "end")
+      .attr("y", -50)
+      .attr("x", -70)
+      .attr("id", "yAxisText")
+      .attr("dy", ".90em")
+      .attr("transform", "rotate(-90)")
+      .text("Número de acidentes");
+
+    this.svg.append("text")
+      .attr("text-anchor", "end")
+      .attr("y", 330)
+      .attr("x", 200)
+      .attr("id", "xAxisText")
+      .attr("dy", ".90em")
+      .text("Dias da semana");
+
     // Initialize the X axis
     this.x = d3.scaleBand()
       .range([ 0, this.width ])
@@ -166,4 +183,12 @@ function update(dataSelector) {
   u
     .exit()
     .remove()
+    
+  if (dataSelector == 1) {
+    barplotsByPeriod.svg.selectAll("#xAxisText")
+      .text("Dias da semana")
+  } else {
+    barplotsByPeriod.svg.selectAll("#xAxisText")
+      .text("Mês do ano")
+  }
 }
