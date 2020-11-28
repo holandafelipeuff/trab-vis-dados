@@ -1,4 +1,4 @@
-class LineplotsTest {
+class LineplotGraph {
   constructor() {
     this.data = null
     this.margin = { top: 30, right: 30, bottom: 70, left: 60 };
@@ -102,31 +102,31 @@ async function load(lineplot) {
   update(1)
 }
 
-let lineplotsTest = new LineplotsTest();
-load(lineplotsTest);
+let lineplotGraph = new LineplotGraph();
+load(lineplotGraph);
 
 // Create a function that takes a dataset as input and update the plot:
 function update(dataSelector) {
 
-  lineplotsTest.setDados(dataSelector);
+  lineplotGraph.setDados(dataSelector);
 
   // Create the X axis:
-  lineplotsTest.x.domain([2007, d3.max(lineplotsTest.data, function (d) { return d.group })]);
-  //lineplotsTest.x.domain(lineplotsTest.data.map(function(d) { return d.group; }));
-  lineplotsTest.svg.selectAll(".myXaxis").transition()
+  lineplotGraph.x.domain([2007, d3.max(lineplotGraph.data, function (d) { return d.group })]);
+  //LineplotGraph.x.domain(lineplotGraph.data.map(function(d) { return d.group; }));
+  lineplotGraph.svg.selectAll(".myXaxis").transition()
     .duration(2000)
-    .call(lineplotsTest.xAxis);
+    .call(lineplotGraph.xAxis);
 
   // create the Y axis
-  lineplotsTest.y.domain([0, d3.max(lineplotsTest.data, function (d) { return d.value })]);
-  lineplotsTest.svg.selectAll(".myYaxis")
+  lineplotGraph.y.domain([0, d3.max(lineplotGraph.data, function (d) { return d.value })]);
+  lineplotGraph.svg.selectAll(".myYaxis")
     .transition()
     .duration(2000)
-    .call(lineplotsTest.yAxis);
+    .call(lineplotGraph.yAxis);
 
   // Create a update selection: bind to the new data
-  var u = lineplotsTest.svg.selectAll(".lineTest")
-    .data([lineplotsTest.data], function (d) { return d.value });
+  var u = lineplotGraph.svg.selectAll(".lineTest")
+    .data([lineplotGraph.data], function (d) { return d.value });
 
   // Updata the line
   u
@@ -137,17 +137,17 @@ function update(dataSelector) {
     .transition()
     .duration(2000)
     .attr("d", d3.line()
-      .x(function (d) { return lineplotsTest.x(d.group); })
-      .y(function (d) { return lineplotsTest.y(d.value); }))
+      .x(function (d) { return lineplotGraph.x(d.group); })
+      .y(function (d) { return lineplotGraph.y(d.value); }))
     .attr("fill", "none")
     .attr("stroke", "steelblue")
     .attr("stroke-width", 2.5)
 
     if (dataSelector == 1) {
-      lineplotsTest.svg.selectAll("#yAxisText")
+      lineplotGraph.svg.selectAll("#yAxisText")
         .text("Número total de feridos em acidentes")
     } else {
-      lineplotsTest.svg.selectAll("#yAxisText")
+      lineplotGraph.svg.selectAll("#yAxisText")
         .text("Número total de mortos em acidentes")
     }
 }
