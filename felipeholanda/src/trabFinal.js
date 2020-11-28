@@ -1,165 +1,41 @@
-class SimpleBarplotsAccidentsByPeriod {
-  constructor(config) {
-    this.config = config;
+class BarplotsByPeriod {
+  constructor() {
+    this.data = null
 
-    this.svg = null;
-    this.margins = null;
+    this.margin = {top: 30, right: 30, bottom: 70, left: 60};
 
-    this.xScale = null;
-    this.yScale = null;
+    this.width = 460 - this.margin.left - this.margin.right,
+    this.height = 400 - this.margin.top - this.margin.bottom;
 
-    this.xExtent = null;
-    this.yExtent = null;
-
-    this.bars = []
-
-    this.createSvg();
-    this.createMargins();
-  }
-
-  createSvg() {
-    this.svg = d3.select(this.config.div)
-      .append("svg")
-      .attr('x', 10)
-      .attr('y', 10)
-      .attr('width', this.config.width + this.config.left + this.config.right)
-      .attr('height', this.config.height + this.config.top + this.config.bottom);
-  }
-
-  createMargins() {
-    this.margins = this.svg
-      .append('g')
-      .attr("transform", `translate(${this.config.left},${this.config.top})`)
-  }
-
-  groupByDiaSemana(data) {
-    let bars = [];
-
-    data.reduce(function(res, value) {
-      if (!res[value.dia_semana]) {
-        res[value.dia_semana] = { dia_semana: value.dia_semana, qtd_acidentes: 0 };
-        bars.push(res[value.dia_semana])
-      }
-      res[value.dia_semana].qtd_acidentes = res[value.dia_semana].qtd_acidentes + 1;
-      return res;
-    }, {});
-
-    return bars;
-  }
-
-  async loadCSV(file) {
-    let data = await d3.csv(file, d => {
-      return {
-        data_inversa: d.data_inversa,
-        dia_semana: d.dia_semana
-      }
-    });
-    this.bars = this.groupByDiaSemana(data);
-    //this.bars2 = this.groupByMes(data);
-  }
-
-  createScales() {
-    this.xExtent = this.bars.map(d => {
-      return d.dia_semana;
-    });
-
-    this.yExtent = d3.extent(this.bars, d => {
-      return d.qtd_acidentes;
-    });
-
-    this.xScale = d3.scaleBand().domain(this.xExtent).range([0, this.config.width]);
-    this.yScale = d3.scaleLinear().domain(this.yExtent).nice().range([this.config.height, 0]);
-  }
-
-  createAxis() {
-    let xAxis = d3.axisBottom(this.xScale);
-
-    let yAxis = d3.axisLeft(this.yScale);
-
-    this.margins
-      .append("g")
-      .attr("transform", `translate(0,${this.config.height})`)
-      .call(xAxis)
-      .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
-
-    this.margins
-      .append("g")
-      .call(yAxis);
-
-    this.svg.append("text")
+    // append the svg object to the body of the page
+    this.svg = d3.select("#main1")
+    .append("svg")
+      .attr("width", this.width + this.margin.left + this.margin.right)
+      .attr("height", this.height + this.margin.top + this.margin.bottom)
+    .append("g")
       .attr("transform",
-            "translate(" + (this.config.width/2 + this.config.left) + " ," + 
-                           (this.config.height + this.config.top + this.config.bottom) + ")")
-      .style("text-anchor", "middle")
-      .text("Dias da semana");
+            "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-    this.svg.append("text")
-      .attr("text-anchor", "end")
-      .attr("y", 6)
-      .attr("x", -200)
-      .attr("dy", ".90em")
-      .attr("transform", "rotate(-90)")
-      .text("Quantidade de acidentes");
+    // Initialize the X axis
+    this.x = d3.scaleBand()
+      .range([ 0, this.width ])
+      .padding(0.2);
+    this.xAxis = this.svg.append("g")
+      .attr("transform", "translate(0," + this.height + ")")
+
+    // Initialize the Y axis
+    this.y = d3.scaleLinear()
+      .range([ this.height, 0]);
+    this.yAxis = this.svg.append("g")
+      .attr("class", "myYaxis")
   }
 
-  renderBars() {
-    this.margins.selectAll('rect')
-      .data(this.bars)
-      .enter()
-      .append('rect')
-        .attr('x', d => this.xScale(d.dia_semana))
-        .attr("width", this.xScale.bandwidth())
-        .attr('fill', '#69b3a2')
-        .attr("height", d => this.config.height - this.yScale(this.yExtent[0]))
-        .attr('y', d => this.yScale(this.yExtent[0]));
-  }
-
-  renderAnimationOnLoading() {
-    this.margins.selectAll('rect')
-      .transition()
-      .duration(800)
-      .attr("y", d => this.yScale(d.qtd_acidentes))
-      .attr("height", d => this.config.height - this.yScale(d.qtd_acidentes))
-      .delay((d,i) => {return(i*100)})
-  }
-}
-
-class BarplotsAccidentsByPeriod {
-  constructor(config) {
-    this.config = config;
-
-    this.svg = null;
-    this.margins = null;
-
-    this.xScale = null;
-    this.yScale = null;
-
-    this.xExtent = null;
-    this.yExtent = null;
-
-    this.bars = []
-    this.bars1 = []
-    this.bars2 = []
-
-    this.createSvg();
-    this.createMargins();
-  }
-
-  createSvg() {
-    this.svg = d3.select(this.config.div)
-      .append("svg")
-      .attr('x', 10)
-      .attr('y', 10)
-      .attr('width', this.config.width + this.config.left + this.config.right)
-      .attr('height', this.config.height + this.config.top + this.config.bottom);
-  }
-
-  createMargins() {
-    this.margins = this.svg
-      .append('g')
-      .attr("transform", `translate(${this.config.left},${this.config.top})`)
+  setDados(dataSelector) {
+    if (dataSelector == 1) {
+      this.data = this.data1;
+    } else if (dataSelector == 2) {
+      this.data = this.data2;
+    }
   }
 
   groupByDiaSemana(data) {
@@ -167,10 +43,10 @@ class BarplotsAccidentsByPeriod {
 
     data.reduce(function(res, value) {
       if (!res[value.dia_semana]) {
-        res[value.dia_semana] = { dia_semana: value.dia_semana, qtd_acidentes: 0 };
+        res[value.dia_semana] = { group: value.dia_semana, value: 0 };
         bars.push(res[value.dia_semana])
       }
-      res[value.dia_semana].qtd_acidentes = res[value.dia_semana].qtd_acidentes + 1;
+      res[value.dia_semana].value = res[value.dia_semana].value + 1;
       return res;
     }, {});
 
@@ -182,10 +58,10 @@ class BarplotsAccidentsByPeriod {
 
     data.reduce(function(res, value) {
       if (!res[value.mes_acidente]) {
-        res[value.mes_acidente] = { mes_acidente: value.mes_acidente, qtd_acidentes: 0 };
+        res[value.mes_acidente] = { group: value.mes_acidente, value: 0 };
         bars.push(res[value.mes_acidente])
       }
-      res[value.mes_acidente].qtd_acidentes = res[value.mes_acidente].qtd_acidentes + 1;
+      res[value.mes_acidente].value = res[value.mes_acidente].value + 1;
       return res;
     }, {});
 
@@ -202,140 +78,53 @@ class BarplotsAccidentsByPeriod {
         mes_acidente: accidentMonth
       }
     });
-    this.bars1 = this.groupByDiaSemana(data);
-    this.bars2 = this.groupByMes(data);
-  }
 
-  createScales(dataSelector) {
-    if (dataSelector == 1) {
-      this.bars = this.bars1;
-    } else if (dataSelector == 2) {
-      this.bars = this.bars2;
-    }
-
-    this.xExtent = this.bars.map(d => {
-      if (dataSelector == 1) {
-        return d.dia_semana;
-      } else if (dataSelector == 2) {
-        return d.mes_acidente
-      }
-    });
-
-    this.yExtent = d3.extent(this.bars, d => {
-      return d.qtd_acidentes;
-    });
-
-    this.xScale = d3.scaleBand().domain(this.xExtent).range([0, this.config.width]);
-    this.yScale = d3.scaleLinear().domain(this.yExtent).nice().range([this.config.height, 0]);
-  }
-
-  createAxis() {
-    let xAxis = d3.axisBottom(this.xScale);
-
-    let yAxis = d3.axisLeft(this.yScale);
-
-    this.margins
-      .append("g")
-      .attr("transform", `translate(0,${this.config.height})`)
-      .call(xAxis)
-      .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
-
-    this.margins
-      .append("g")
-      .call(yAxis);
-
-    this.margins
-      .exit()
-      .remove()
-
-    this.svg.append("text")
-      .attr("transform",
-            "translate(" + (this.config.width/2 + this.config.left) + " ," + 
-                           (this.config.height + this.config.top + this.config.bottom) + ")")
-      .style("text-anchor", "middle")
-      .text("Dias da semana");
-
-    this.svg.append("text")
-      .attr("text-anchor", "end")
-      .attr("y", 6)
-      .attr("x", -200)
-      .attr("dy", ".90em")
-      .attr("transform", "rotate(-90)")
-      .text("Quantidade de acidentes");
-  }
-
-  renderBars(dataSelector) {
-    if (dataSelector == 1) {
-      this.margins.selectAll('rect')
-        .data(this.bars)
-        .enter()
-        .append('rect')
-          .attr('x', d => this.xScale(d.dia_semana))
-          .attr("width", this.xScale.bandwidth())
-          .attr('fill', '#69b3a2')
-          .attr("height", d => this.config.height - this.yScale(this.yExtent[0]))
-          .attr('y', d => this.yScale(this.yExtent[0]));
-
-      this.margins
-        .exit()
-        .remove()
-    } else if (dataSelector == 2) {
-      this.margins.selectAll('rect')
-        .data(this.bars)
-        .enter()
-        .append('rect')
-          .attr('x', d => this.xScale(d.mes_acidente))
-          .attr("width", this.xScale.bandwidth())
-          .attr('fill', '#69b3a2')
-          .attr("height", d => this.config.height - this.yScale(this.yExtent[0]))
-          .attr('y', d => this.yScale(this.yExtent[0]));
-
-      this.margins
-        .exit()
-        .remove()
-    }
-  }
-
-  renderAnimationOnLoading() {
-    this.margins.selectAll('rect')
-      .transition()
-      .duration(800)
-      .attr("y", d => this.yScale(d.qtd_acidentes))
-      .attr("height", d => this.config.height - this.yScale(d.qtd_acidentes))
-      .delay((d,i) => {return(i*100)})
+    this.data1 = this.groupByDiaSemana(data);
+    this.data2 = this.groupByMes(data);
   }
 }
 
-let simpleBarplotsConfig = {div: '#main1', width: 500, height: 500, top: 100, left: 120, bottom: 100, right: 120};
-let simpleBarplotsClass = new SimpleBarplotsAccidentsByPeriod(simpleBarplotsConfig);
-
-let barplotsConfig = {div: '#main2', width: 500, height: 500, top: 100, left: 120, bottom: 100, right: 120};
-let barplotsClass = new BarplotsAccidentsByPeriod(barplotsConfig);
-
-async function main() {
+async function loadInfo(barplotsByPeriod) {
+  await barplotsByPeriod.loadCSV('../../data/data.csv');
   
-  await simpleBarplotsClass.loadCSV('../../data/data.csv');
+  // Initialize the plot with the first dataset
+  update(1)
+}
 
-  simpleBarplotsClass.createScales();
-  simpleBarplotsClass.createAxis();
-  simpleBarplotsClass.renderBars();
-  simpleBarplotsClass.renderAnimationOnLoading();
+let barplotsByPeriod = new BarplotsByPeriod();
+loadInfo(barplotsByPeriod);
 
+// Função para criar e dar update no grágico
+async function update(dataSelector) {
   
-  await barplotsClass.loadCSV('../../data/data.csv');
-  update(2)
-  //barplotsClass.createAxis();
-  //barplotsClass.renderBars();
-  //barplotsClass.renderAnimationOnLoading()
-}
+  barplotsByPeriod.setDados(dataSelector);
 
-function update(dataSelector) {
-  barplotsClass.createScales(dataSelector);
-  barplotsClass.createAxis();
-  barplotsClass.renderBars(dataSelector);
-  barplotsClass.renderAnimationOnLoading()
-}
+  // Update the X axis
+  barplotsByPeriod.x.domain(barplotsByPeriod.data.map(function(d) { return d.group; }))
+  barplotsByPeriod.xAxis.transition().duration(1000).call(d3.axisBottom(barplotsByPeriod.x))
 
-main();
+  // Update the Y axis
+  barplotsByPeriod.y.domain([0, d3.max(barplotsByPeriod.data, function(d) { return d.value }) ]);
+  barplotsByPeriod.yAxis.transition().duration(1000).call(d3.axisLeft(barplotsByPeriod.y));
+
+  // Create the u variable
+  var u = barplotsByPeriod.svg.selectAll("rect")
+    .data(barplotsByPeriod.data)
+
+  u
+    .enter()
+    .append("rect") // Add a new rect for each new elements
+    .merge(u) // get the already existing elements as well
+    .transition() // and apply changes to all of them
+    .duration(1000)
+      .attr("x", function(d) { return barplotsByPeriod.x(d.group); })
+      .attr("y", function(d) { return barplotsByPeriod.y(d.value); })
+      .attr("width", barplotsByPeriod.x.bandwidth())
+      .attr("height", function(d) { return barplotsByPeriod.height - barplotsByPeriod.y(d.value); })
+      .attr("fill", "#69b3a2")
+
+  // If less group in the new dataset, I delete the ones not in use anymore
+  u
+    .exit()
+    .remove()
+}
