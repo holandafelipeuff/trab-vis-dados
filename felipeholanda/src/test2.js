@@ -56,10 +56,10 @@ class BarplotsByPeriod {
 
     data.reduce(function(res, value) {
       if (!res[value.dia_semana]) {
-        res[value.dia_semana] = { dia_semana: value.dia_semana, qtd_acidentes: 0 };
+        res[value.dia_semana] = { group: value.dia_semana, value: 0 };
         bars.push(res[value.dia_semana])
       }
-      res[value.dia_semana].qtd_acidentes = res[value.dia_semana].qtd_acidentes + 1;
+      res[value.dia_semana].value = res[value.dia_semana].value + 1;
       return res;
     }, {});
 
@@ -71,10 +71,10 @@ class BarplotsByPeriod {
 
     data.reduce(function(res, value) {
       if (!res[value.mes_acidente]) {
-        res[value.mes_acidente] = { mes_acidente: value.mes_acidente, qtd_acidentes: 0 };
+        res[value.mes_acidente] = { group: value.mes_acidente, value: 0 };
         bars.push(res[value.mes_acidente])
       }
-      res[value.mes_acidente].qtd_acidentes = res[value.mes_acidente].qtd_acidentes + 1;
+      res[value.mes_acidente].value = res[value.mes_acidente].value + 1;
       return res;
     }, {});
 
