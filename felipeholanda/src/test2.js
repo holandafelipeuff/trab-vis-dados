@@ -1,5 +1,18 @@
 class BarplotsByPeriod {
   constructor() {
+    this.data1 = [
+      {group: "A", value: 4},
+      {group: "B", value: 16},
+      {group: "C", value: 8}
+    ];
+
+    this.data2 = [
+      {group: "A", value: 7},
+      {group: "B", value: 1},
+      {group: "C", value: 20},
+      {group: "D", value: 10}
+    ];
+
     this.data = null
 
     this.margin = {top: 30, right: 30, bottom: 70, left: 60};
@@ -84,24 +97,42 @@ class BarplotsByPeriod {
   }
 }
 
-async function loadInfo(barplotsByPeriod) {
-  await barplotsByPeriod.loadCSV('../../data/data.csv');
-  
-  // Initialize the plot with the first dataset
-  update(1)
-}
+/*
+// create 2 data_set
+var data1 = [
+  {group: "A", value: 4},
+  {group: "B", value: 16},
+  {group: "C", value: 8}
+];
+
+var data2 = [
+  {group: "A", value: 7},
+  {group: "B", value: 1},
+  {group: "C", value: 20},
+  {group: "D", value: 10}
+];
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 30, bottom: 70, left: 60},
+   width = 460 - margin.left - margin.right,
+   height = 400 - margin.top - margin.bottom;
+*/
 
 let barplotsByPeriod = new BarplotsByPeriod();
-loadInfo(barplotsByPeriod);
 
-// Função para criar e dar update no grágico
+// A function that create / update the plot for a given variable:
 async function update(dataSelector) {
+
+  await barplotsByPeriod.loadCSV('../../data/data.csv');
   
   barplotsByPeriod.setDados(dataSelector);
 
+  console.log(barplotsByPeriod.data1)
+  console.log(barplotsByPeriod.data2)
+
   // Update the X axis
   barplotsByPeriod.x.domain(barplotsByPeriod.data.map(function(d) { return d.group; }))
-  barplotsByPeriod.xAxis.transition().duration(1000).call(d3.axisBottom(barplotsByPeriod.x))
+  barplotsByPeriod.xAxis.call(d3.axisBottom(barplotsByPeriod.x))
 
   // Update the Y axis
   barplotsByPeriod.y.domain([0, d3.max(barplotsByPeriod.data, function(d) { return d.value }) ]);
@@ -128,3 +159,6 @@ async function update(dataSelector) {
     .exit()
     .remove()
 }
+
+// Initialize the plot with the first dataset
+update(1)
