@@ -1,23 +1,9 @@
 class LineplotsTest {
   constructor() {
-    /*
-    this.data1 = [
-      { ser1: 0.3, ser2: 4 },
-      { ser1: 2, ser2: 16 },
-      { ser1: 3, ser2: 8 }
-    ];
-
-    this.data2 = [
-      { ser1: 1, ser2: 7 },
-      { ser1: 4, ser2: 1 },
-      { ser1: 6, ser2: 8 }
-    ];
-    */
     this.data = null
-
     this.margin = { top: 30, right: 30, bottom: 70, left: 60 };
 
-    this.width = 460 - this.margin.left - this.margin.right,
+    this.width = 700 - this.margin.left - this.margin.right,
       this.height = 400 - this.margin.top - this.margin.bottom;
 
     this.svg = d3.select("#my_dataviz")
@@ -27,19 +13,36 @@ class LineplotsTest {
       .append("g")
       .attr("transform",
         "translate(" + this.margin.left + "," + this.margin.top + ")");
-        // Initialise a X axis:
-    this.x = d3.scaleLinear().range([0,this.width]);
+
+    // Initialise a X axis:
+    this.x = d3.scaleLinear().range([0, this.width]);
     this.xAxis = d3.axisBottom().scale(this.x);
     this.svg.append("g")
       .attr("transform", "translate(0," + this.height + ")")
-      .attr("class","myXaxis")
-    
+      .attr("class", "myXaxis")
+
     // Initialize an Y axis
     this.y = d3.scaleLinear().range([this.height, 0]);
     this.yAxis = d3.axisLeft().scale(this.y);
     this.svg.append("g")
-      .attr("class","myYaxis")
-    
+      .attr("class", "myYaxis")
+
+    this.svg.append("text")
+      .attr("text-anchor", "end")
+      .attr("y", 330)
+      .attr("x", 200)
+      .attr("id", "xAxisText")
+      .attr("dy", ".90em")
+      .text("Ano");
+
+    this.svg.append("text")
+      .attr("text-anchor", "end")
+      .attr("y", -50)
+      .attr("x", -30)
+      .attr("id", "yAxisText")
+      .attr("dy", ".90em")
+      .attr("transform", "rotate(-90)")
+      .text("Número total de feridos em acidentes");
   }
 
   setDados(dataSelector) {
@@ -51,14 +54,14 @@ class LineplotsTest {
   }
 
   groupPeopleByYear(data) {
-    let set = [];
+    let set = []
 
-    data.reduce(function(res, value) {
+    data.reduce(function (res, value) {
       if (!res[value.ano]) {
         res[value.ano] = { group: value.ano, value: 0 };
         set.push(res[value.ano])
       }
-      res[value.ano].value += value.pessoas;
+      res[value.ano].value += value.feridos;
       return res;
     }, {});
 
@@ -68,12 +71,12 @@ class LineplotsTest {
   groupDeathsByYear(data) {
     let set = [];
 
-    data.reduce(function(res, value) {
+    data.reduce(function (res, value) {
       if (!res[value.ano]) {
         res[value.ano] = { group: value.ano, value: 0 };
         set.push(res[value.ano])
       }
-      res[value.ano].value = value.mortos;
+      res[value.ano].value += value.mortos;
       return res;
     }, {});
 
@@ -84,8 +87,8 @@ class LineplotsTest {
     let data = await d3.csv(file, d => {
       return {
         ano: d.ano,
-        pessoas: d.pessoas,
-        mortos: d.mortos
+        feridos: +d.feridos,
+        mortos: +d.mortos
       }
     });
 
@@ -104,17 +107,18 @@ load(lineplotsTest);
 
 // Create a function that takes a dataset as input and update the plot:
 function update(dataSelector) {
-    
+
   lineplotsTest.setDados(dataSelector);
-  
+
   // Create the X axis:
-  lineplotsTest.x.domain([0, d3.max(lineplotsTest.data, function(d) { return d.group }) ]);
+  lineplotsTest.x.domain([2007, d3.max(lineplotsTest.data, function (d) { return d.group })]);
+  //lineplotsTest.x.domain(lineplotsTest.data.map(function(d) { return d.group; }));
   lineplotsTest.svg.selectAll(".myXaxis").transition()
     .duration(2000)
     .call(lineplotsTest.xAxis);
 
   // create the Y axis
-  lineplotsTest.y.domain([0, d3.max(lineplotsTest.data, function(d) { return d.value  }) ]);
+  lineplotsTest.y.domain([0, d3.max(lineplotsTest.data, function (d) { return d.value })]);
   lineplotsTest.svg.selectAll(".myYaxis")
     .transition()
     .duration(2000)
@@ -122,20 +126,28 @@ function update(dataSelector) {
 
   // Create a update selection: bind to the new data
   var u = lineplotsTest.svg.selectAll(".lineTest")
-    .data([lineplotsTest.data], function(d){ return d.value });
+    .data([lineplotsTest.data], function (d) { return d.value });
 
   // Updata the line
   u
     .enter()
     .append("path")
-    .attr("class","lineTest")
+    .attr("class", "lineTest")
     .merge(u)
     .transition()
     .duration(2000)
     .attr("d", d3.line()
-      .x(function(d) { return lineplotsTest.x(d.group); })
-      .y(function(d) { return lineplotsTest.y(d.value); }))
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 2.5)
+      .x(function (d) { return lineplotsTest.x(d.group); })
+      .y(function (d) { return lineplotsTest.y(d.value); }))
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 2.5)
+
+    if (dataSelector == 1) {
+      lineplotsTest.svg.selectAll("#yAxisText")
+        .text("Número total de feridos em acidentes")
+    } else {
+      lineplotsTest.svg.selectAll("#yAxisText")
+        .text("Número total de mortos em acidentes")
+    }
 }
