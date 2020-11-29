@@ -142,7 +142,7 @@ async function loadInfo(barplotsByPeriod) {
   await barplotsByPeriod.loadCSV('../../data/data.csv');
 
   // Initialize the plot with the first dataset
-  update(1)
+  updateBarplotsByPeriod(1)
 }
 
 let selecElement = document.getElementById("ano");
@@ -151,7 +151,7 @@ let barplotsByPeriod = new BarplotsByPeriod();
 loadInfo(barplotsByPeriod);
 
 // Função para criar e dar update no grágico
-function update(dataSelector) {  
+function updateBarplotsByPeriod(dataSelector) {  
   barplotsByPeriod.setData1AndData2();
   barplotsByPeriod.setDados(dataSelector);
 
