@@ -28,29 +28,96 @@ var svg = d3.select("#main2")
 //Read the data
 d3.csv("../../data/data.csv", function(loadedData) {
 
-  let data = []
+  function filterAndParametrizeHeatmapData(heatmapData) {
 
-  loadedData.forEach(eachData => {
-    let km = +eachData.km - 321
+    let newHeatmapData = []
 
-    data.push({
-      veiculos: +eachData.veiculos,
-      km: Math.round(km),
-      qtd_acidentes: 0 + Math.floor((10 - 0) * Math.random())
-    })
-  });
+    heatmapData.forEach(element => {
+      if (element.qtd_acidentes <= 300){
+        if (element.qtd_acidentes >= 0 && element.qtd_acidentes < 20) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 1, parametrized_text: '0 a 20 acidentes' })
+        } else if (element.qtd_acidentes >= 20 && element.qtd_acidentes < 40) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 2, parametrized_text: '20 a 40 acidentes' })
+        } else if (element.qtd_acidentes >= 40 && element.qtd_acidentes < 60) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 3, parametrized_text: '40 a 60 acidentes' })
+        } else if (element.qtd_acidentes >= 60 && element.qtd_acidentes < 80) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 4, parametrized_text: '60 a 80 acidentes' })
+        } else if (element.qtd_acidentes >= 80 && element.qtd_acidentes < 100) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 5, parametrized_text: '80 a 100 acidentes' })
+        } else if (element.qtd_acidentes >= 100 && element.qtd_acidentes < 120) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 6, parametrized_text: '100 a 120 acidentes' })
+        } else if (element.qtd_acidentes >= 120 && element.qtd_acidentes < 140) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 7, parametrized_text: '120 a 140 acidentes' })
+        } else if (element.qtd_acidentes >= 140 && element.qtd_acidentes < 160) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 8, parametrized_text: '140 a 160 acidentes' })
+        } else if (element.qtd_acidentes >= 160 && element.qtd_acidentes < 180) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 9, parametrized_text: '160 a 180 acidentes' })
+        } else if (element.qtd_acidentes >= 180 && element.qtd_acidentes < 200) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 10, parametrized_text: '180 a 200 acidentes' })
+        } else if (element.qtd_acidentes >= 200 && element.qtd_acidentes < 220) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 11, parametrized_text: '200 a 220 acidentes' })
+        } else if (element.qtd_acidentes >= 220 && element.qtd_acidentes < 240) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 12, parametrized_text: '220 a 240 acidentes' })
+        } else if (element.qtd_acidentes >= 240 && element.qtd_acidentes < 260) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 13, parametrized_text: '240 a 260 acidentes' })
+        } else if (element.qtd_acidentes >= 2600 && element.qtd_acidentes < 280) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 14, parametrized_text: '2600 a 280 acidentes' })
+        } else {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 15, parametrized_text: '280 a 300 acidentes' })
+        }
+      }
+    });
+
+    return newHeatmapData;
+
+  }
+
+  function groupByKmAndVehicle() {
+    let heatmapData = [];
+
+    loadedData.reduce(function(res, value) {
+     
+      value.km = Math.round(+value.km - 321);
+
+      if (!res[value.km + "-" + value.veiculos]) {
+        res[value.km + "-" + value.veiculos] = { veiculos: value.veiculos, km: value.km, qtd_acidentes: 0 };
+        heatmapData.push(res[value.km + "-" + value.veiculos])
+      }
+      
+      res[value.km + "-" + value.veiculos].qtd_acidentes = res[value.km + "-" + value.veiculos].qtd_acidentes + 1;
+    
+      return res;
+    }, {});
+    
+    return filterAndParametrizeHeatmapData(heatmapData);
+  }
+
+  let data = groupByKmAndVehicle();
 
   console.log(data)
 
   // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
-  var myGroups = d3.map(data, function(d){return d.veiculos;}).keys()
-  var myVars = d3.map(data, function(d){return d.km;}).keys()
+  var tempMyGroups = d3.map(data, function(d){return d.veiculos;}).keys()
+  var tempMyVars = d3.map(data, function(d){return d.km;}).keys()
 
+  let myGroups = [];
+  let myVars = [];
 
-  console.log(myVars)
-  myVars = myVars.sort();
-  
-  console.log(myVars)
+  tempMyGroups.forEach(element => {
+    myGroups.push(parseInt(element))
+  });
+
+  tempMyVars.forEach(element => {
+    myVars.push(parseInt(element))
+  });
+
+  myVars.sort(function(a, b) {
+    return a - b;
+  });
+
+  myGroups.sort(function(a, b) {
+    return a - b;
+  });
 
   // Build X scales and axis:
   var x = d3.scaleBand()
@@ -76,7 +143,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
   // Build color scale
   var myColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
-    .domain([1,10])
+    .domain([1,15])
 
   // create a tooltip
   var tooltip = d3.select("#main2")
@@ -99,7 +166,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
   }
   var mousemove = function(d) {
     tooltip
-      .html("The exact value of<br>this cell is: " + d.qtd_acidentes)
+      .html("The exact value of<br>this cell is: " + d.parametrized_text)
       .style("left", (d3.mouse(this)[0]+70) + "px")
       .style("top", (d3.mouse(this)[1]) + "px")
   }
