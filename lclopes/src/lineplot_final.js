@@ -53,7 +53,7 @@ class LineplotGraph {
     }
   }
 
-  groupPeopleByYear(data) {
+  groupWoundedByYear(data) {
     let set = []
 
     data.reduce(function (res, value) {
@@ -92,7 +92,7 @@ class LineplotGraph {
       }
     });
 
-    this.data1 = this.groupPeopleByYear(data);
+    this.data1 = this.groupWoundedByYear(data);
     this.data2 = this.groupDeathsByYear(data);
   }
 }
