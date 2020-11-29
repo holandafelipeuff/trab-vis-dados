@@ -11,7 +11,7 @@
 <script>
 
 // set the dimensions and margins of the graph
-var margin = {top: 80, right: 25, bottom: 30, left: 40};
+var margin = {top: 20, right: 25, bottom: 50, left: 40};
   
 var width = 450 - margin.left - margin.right;
 var height = 450 - margin.top - margin.bottom;
@@ -25,6 +25,24 @@ var svg = d3.select("#main2")
   .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
 
+svg.append("text")
+  .attr("text-anchor", "end")
+  .attr("y", -40)
+  .attr("x", -140)
+  .attr("id", "yAxisText")
+  .attr("dy", ".90em")
+  .attr("transform", "rotate(-90)")
+  .text("Km da via");
+
+svg.append("text")
+  .attr("text-anchor", "end")
+  .attr("y", 405)
+  .attr("x", 290)
+  .attr("id", "xAxisText")
+  .attr("dy", ".90em")
+  .text("Número de veículos envolvidos");
+
+
 //Read the data
 d3.csv("../../data/data.csv", function(loadedData) {
 
@@ -33,7 +51,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
     let newHeatmapData = []
 
     heatmapData.forEach(element => {
-      if (element.qtd_acidentes <= 300){
+      if (element.qtd_acidentes <= 2000){
         if (element.qtd_acidentes >= 0 && element.qtd_acidentes < 20) {
           newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 1, parametrized_text: '0 a 20 acidentes' })
         } else if (element.qtd_acidentes >= 20 && element.qtd_acidentes < 40) {
@@ -60,10 +78,22 @@ d3.csv("../../data/data.csv", function(loadedData) {
           newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 12, parametrized_text: '220 a 240 acidentes' })
         } else if (element.qtd_acidentes >= 240 && element.qtd_acidentes < 260) {
           newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 13, parametrized_text: '240 a 260 acidentes' })
-        } else if (element.qtd_acidentes >= 2600 && element.qtd_acidentes < 280) {
-          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 14, parametrized_text: '2600 a 280 acidentes' })
-        } else {
+        } else if (element.qtd_acidentes >= 260 && element.qtd_acidentes < 280) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 14, parametrized_text: '260 a 280 acidentes' })
+        } else if (element.qtd_acidentes >= 280 && element.qtd_acidentes < 300) {
           newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 15, parametrized_text: '280 a 300 acidentes' })
+        } else if (element.qtd_acidentes >= 300 && element.qtd_acidentes < 320) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 16, parametrized_text: '300 a 320 acidentes' })
+        } else if (element.qtd_acidentes >= 320 && element.qtd_acidentes < 340) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 17, parametrized_text: '320 a 340 acidentes' })
+        } else if (element.qtd_acidentes >= 340 && element.qtd_acidentes < 360) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 18, parametrized_text: '340 a 360 acidentes' })
+        } else if (element.qtd_acidentes >= 360 && element.qtd_acidentes < 380) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 19, parametrized_text: '360 a 380 acidentes' })
+        } else if (element.qtd_acidentes >= 380 && element.qtd_acidentes < 400) {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 20, parametrized_text: '380 a 400 acidentes' })
+        } else {
+          newHeatmapData.push({ veiculos: element.veiculos, km: element.km, qtd_acidentes: 21, parametrized_text: '(OUTLIER) 400 a 2000 acidentes' })
         }
       }
     });
@@ -143,7 +173,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
   // Build color scale
   var myColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
-    .domain([1,15])
+    .domain([1,21])
 
   // create a tooltip
   var tooltip = d3.select("#main2")
@@ -166,7 +196,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
   }
   var mousemove = function(d) {
     tooltip
-      .html("The exact value of<br>this cell is: " + d.parametrized_text)
+      .html("A quantidade de acidentes<br>para esta célula é de: " + d.parametrized_text)
       .style("left", (d3.mouse(this)[0]+70) + "px")
       .style("top", (d3.mouse(this)[1]) + "px")
   }
@@ -197,26 +227,5 @@ d3.csv("../../data/data.csv", function(loadedData) {
     .on("mousemove", mousemove)
     .on("mouseleave", mouseleave)
 })
-
-/*
-
-// Add title to graph
-svg.append("text")
-        .attr("x", 0)
-        .attr("y", -50)
-        .attr("text-anchor", "left")
-        .style("font-size", "22px")
-        .text("A d3.js heatmap");
-
-// Add subtitle to graph
-svg.append("text")
-        .attr("x", 0)
-        .attr("y", -20)
-        .attr("text-anchor", "left")
-        .style("font-size", "14px")
-        .style("fill", "grey")
-        .style("max-width", 400)
-        .text("A short description of the take-away message of this chart.");
-*/
 
 </script>
