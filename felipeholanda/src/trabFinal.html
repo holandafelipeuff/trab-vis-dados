@@ -10,8 +10,8 @@
 <body>
     <div style="width: 100%; overflow: hidden;">
         <div style="width: 600px; float: left;">
-            <button onclick="update(1)">Nº Acidentes / Dia da semana</button>
-            <button onclick="update(2)">Nº Acidentes / Mês do ano</button>
+            <button onclick="updateBarplotsByPeriod(1)">Nº Acidentes / Dia da semana</button>
+            <button onclick="updateBarplotsByPeriod(2)">Nº Acidentes / Mês do ano</button>
 
             <select id="ano">
                 <option value="2007">2007</option>
@@ -33,7 +33,12 @@
             <div id="main1">
             </div> 
         </div>
+
+        <div style="width: 600px; float: left;">
+            <div id="main2">
+            </div> 
+        </div>
     </div>
 </body>
-<script src="trabFinal.js"></script>
+<script src="barplotsByPeriod.js"></script>
 </html>
