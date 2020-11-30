@@ -28,7 +28,7 @@ class LineplotGraph {
     this.svg.append("text")
       .attr("text-anchor", "end")
       .attr("y", 330)
-      .attr("x", 200)
+      .attr("x", 300)
       .attr("id", "xAxisText")
       .attr("dy", ".90em")
       .text("Ano");
