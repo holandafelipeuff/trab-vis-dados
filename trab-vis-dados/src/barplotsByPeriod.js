@@ -7,7 +7,6 @@ class BarplotsByPeriod {
     this.width = 460 - this.margin.left - this.margin.right,
     this.height = 400 - this.margin.top - this.margin.bottom;
 
-    // append the svg object to the body of the page
     this.svg = d3.select("#main1")
     .append("svg")
       .attr("width", this.width + this.margin.left + this.margin.right)
@@ -33,14 +32,12 @@ class BarplotsByPeriod {
       .attr("dy", ".90em")
       .text("Dias da semana");
 
-    // Initialize the X axis
     this.x = d3.scaleBand()
       .range([ 0, this.width ])
       .padding(0.2);
     this.xAxis = this.svg.append("g")
       .attr("transform", "translate(0," + this.height + ")")
 
-    // Initialize the Y axis
     this.y = d3.scaleLinear()
       .range([ this.height, 0]);
     this.yAxis = this.svg.append("g")
@@ -141,7 +138,6 @@ class BarplotsByPeriod {
 async function loadInfo(barplotsByPeriod) {
   await barplotsByPeriod.loadCSV('../../data/data.csv');
 
-  // Initialize the plot with the first dataset
   updateBarplotsByPeriod(1)
 }
 
@@ -155,23 +151,20 @@ function updateBarplotsByPeriod(dataSelector) {
   barplotsByPeriod.setData1AndData2();
   barplotsByPeriod.setDados(dataSelector);
 
-  // Update the X axis
   barplotsByPeriod.x.domain(barplotsByPeriod.data.map(function(d) { return d.group; }))
   barplotsByPeriod.xAxis.transition().duration(1000).call(d3.axisBottom(barplotsByPeriod.x))
 
-  // Update the Y axis
   barplotsByPeriod.y.domain([0, d3.max(barplotsByPeriod.data, function(d) { return d.value }) ]);
   barplotsByPeriod.yAxis.transition().duration(1000).call(d3.axisLeft(barplotsByPeriod.y));
 
-  // Create the u variable
-  var u = barplotsByPeriod.svg.selectAll("rect")
+  var rect = barplotsByPeriod.svg.selectAll("rect")
     .data(barplotsByPeriod.data)
 
-  u
+  rect
     .enter()
-    .append("rect") // Add a new rect for each new elements
-    .merge(u) // get the already existing elements as well
-    .transition() // and apply changes to all of them
+    .append("rect") 
+    .merge(rect) 
+    .transition() 
     .duration(1000)
       .attr("x", function(d) { return barplotsByPeriod.x(d.group); })
       .attr("y", function(d) { return barplotsByPeriod.y(d.value); })
@@ -179,8 +172,7 @@ function updateBarplotsByPeriod(dataSelector) {
       .attr("height", function(d) { return barplotsByPeriod.height - barplotsByPeriod.y(d.value); })
       .attr("fill", "#69b3a2")
 
-  // If less group in the new dataset, I delete the ones not in use anymore
-  u
+  rect
     .exit()
     .remove()
     

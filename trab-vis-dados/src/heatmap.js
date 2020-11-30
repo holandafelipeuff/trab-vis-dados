@@ -1,9 +1,9 @@
-var margin = {top: 20, right: 25, bottom: 50, left: 40};
+let margin = {top: 20, right: 25, bottom: 50, left: 40};
   
-var width = 450 - margin.left - margin.right;
-var height = 450 - margin.top - margin.bottom;
+let width = 450 - margin.left - margin.right;
+let height = 450 - margin.top - margin.bottom;
 
-var svg = d3.select("#main2")
+let svg = d3.select("#main2")
 .append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
@@ -109,21 +109,21 @@ d3.csv("../../data/data.csv", function(loadedData) {
 
   let data = groupByKmAndVehicle(loadedData);
 
-  var tempMyGroups = d3.map(data, function(d){return d.veiculos;}).keys()
-  var tempMyVars = d3.map(data, function(d){return d.km;}).keys()
+  let tempMyGroups = d3.map(data, function(d){return d.veiculos;}).keys()
+  let tempMylets = d3.map(data, function(d){return d.km;}).keys()
 
   let myGroups = [];
-  let myVars = [];
+  let mylets = [];
 
   tempMyGroups.forEach(element => {
     myGroups.push(parseInt(element))
   });
 
-  tempMyVars.forEach(element => {
-    myVars.push(parseInt(element))
+  tempMylets.forEach(element => {
+    mylets.push(parseInt(element))
   });
 
-  myVars.sort(function(a, b) {
+  mylets.sort(function(a, b) {
     return a - b;
   });
 
@@ -131,7 +131,7 @@ d3.csv("../../data/data.csv", function(loadedData) {
     return a - b;
   });
 
-  var x = d3.scaleBand()
+  let x = d3.scaleBand()
     .range([ 0, width ])
     .domain(myGroups)
     .padding(0.05);
@@ -141,20 +141,20 @@ d3.csv("../../data/data.csv", function(loadedData) {
     .call(d3.axisBottom(x).tickSize(0))
     .select(".domain").remove()
 
-  var y = d3.scaleBand()
+  let y = d3.scaleBand()
     .range([ height, 0 ])
-    .domain(myVars)
+    .domain(mylets)
     .padding(0.05);
   svg.append("g")
     .style("font-size", 15)
     .call(d3.axisLeft(y).tickSize(0))
     .select(".domain").remove()
 
-  var myColor = d3.scaleSequential()
+  let myColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
     .domain([1,21])
 
-  var tooltip = d3.select("#main2")
+  let tooltip = d3.select("#main2")
     .append("div")
     .style("opacity", 0)
     .attr("class", "tooltip")
@@ -164,20 +164,20 @@ d3.csv("../../data/data.csv", function(loadedData) {
     .style("border-radius", "5px")
     .style("padding", "5px")
 
-  var mouseover = function(d) {
+  let mouseover = function(d) {
     tooltip
       .style("opacity", 1)
     d3.select(this)
       .style("stroke", "black")
       .style("opacity", 1)
   }
-  var mousemove = function(d) {
+  let mousemove = function(d) {
     tooltip
       .html("A quantidade de acidentes<br>para esta célula é de: " + d.parametrized_text)
       .style("left", (d3.mouse(this)[0]+70) + "px")
       .style("top", (d3.mouse(this)[1]) + "px")
   }
-  var mouseleave = function(d) {
+  let mouseleave = function(d) {
     tooltip
       .style("opacity", 0)
     d3.select(this)
