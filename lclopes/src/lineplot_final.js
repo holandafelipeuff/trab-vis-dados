@@ -6,7 +6,7 @@ class LineplotGraph {
     this.width = 700 - this.margin.left - this.margin.right,
       this.height = 400 - this.margin.top - this.margin.bottom;
 
-    this.svg = d3.select("#my_dataviz")
+    this.svg = d3.select("#lineplot")
       .append("svg")
       .attr("width", this.width + this.margin.left + this.margin.right)
       .attr("height", this.height + this.margin.top + this.margin.bottom)
@@ -14,14 +14,12 @@ class LineplotGraph {
       .attr("transform",
         "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-    // Initialise a X axis:
     this.x = d3.scaleLinear().range([0, this.width]);
     this.xAxis = d3.axisBottom().scale(this.x);
     this.svg.append("g")
       .attr("transform", "translate(0," + this.height + ")")
       .attr("class", "myXaxis")
 
-    // Initialize an Y axis
     this.y = d3.scaleLinear().range([this.height, 0]);
     this.yAxis = d3.axisLeft().scale(this.y);
     this.svg.append("g")
@@ -105,30 +103,24 @@ async function load(lineplot) {
 let lineplotGraph = new LineplotGraph();
 load(lineplotGraph);
 
-// Create a function that takes a dataset as input and update the plot:
 function update(dataSelector) {
 
   lineplotGraph.setDados(dataSelector);
 
-  // Create the X axis:
   lineplotGraph.x.domain([2007, d3.max(lineplotGraph.data, function (d) { return d.group })]);
-  //LineplotGraph.x.domain(lineplotGraph.data.map(function(d) { return d.group; }));
   lineplotGraph.svg.selectAll(".myXaxis").transition()
     .duration(2000)
     .call(lineplotGraph.xAxis);
 
-  // create the Y axis
   lineplotGraph.y.domain([0, d3.max(lineplotGraph.data, function (d) { return d.value })]);
   lineplotGraph.svg.selectAll(".myYaxis")
     .transition()
     .duration(2000)
     .call(lineplotGraph.yAxis);
 
-  // Create a update selection: bind to the new data
   var u = lineplotGraph.svg.selectAll(".lineTest")
     .data([lineplotGraph.data], function (d) { return d.value });
 
-  // Updata the line
   u
     .enter()
     .append("path")
